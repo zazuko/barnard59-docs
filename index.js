@@ -1,13 +1,13 @@
 import { readFile } from 'fs/promises'
 import fetch from '@rdfjs/fetch'
+import clownface from 'clownface-io'
 import namespace from '@rdfjs/namespace'
-import clownface from 'clownface'
-import rdf from 'rdf-ext'
+import path from 'path'
 
 const defaults = {
   language: ['en', '*'],
-  operationTemplate: await readFile('operation.template'),
-  packageTemplate: await readFile('package.template')
+  operationTemplate: await readFile(new URL('./operation.template', import.meta.url)),
+  packageTemplate: await readFile(new URL('./package.template', import.meta.url))
 }
 
 const ns = {
@@ -17,7 +17,11 @@ const ns = {
   rdfs: namespace('http://www.w3.org/2000/01/rdf-schema#')
 }
 
-async function packageInfo (name) {
+async function packageInfo ({ name, dir }) {
+  if (!name) {
+    return readFile(path.resolve(process.cwd(), dir, 'package.json'))
+  }
+
   const res = await fetch(`https://unpkg.com/${name}/package.json`)
 
   if (!res.ok) {
@@ -27,14 +31,18 @@ async function packageInfo (name) {
   return res.json()
 }
 
-async function packageManifest (name) {
-  const res = await fetch(`https://unpkg.com/${name}/manifest.ttl`, { factory: rdf })
+async function packageManifest ({ name, dir, manifest }) {
+  const manifestPtr = name
+    ? clownface().namedNode(`https://unpkg.com/${name}/manifest.ttl`)
+    : clownface().namedNode(`file:${path.resolve(process.cwd(), dir, manifest)}`)
 
-  if (!res.ok) {
-    throw new Error(`${res.status}: ${res.statusText}`)
+  const res = await manifestPtr.fetch()
+
+  for (const { response } of res.failures.values()) {
+    throw new Error(`${response.status}: ${response.statusText}`)
   }
 
-  return clownface({ dataset: await res.dataset() })
+  return res
 }
 
 function operationToMarkdown (operation, { language, template }) {

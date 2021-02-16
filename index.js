@@ -19,7 +19,8 @@ const ns = {
 
 async function packageInfo ({ name, dir }) {
   if (!name) {
-    return readFile(path.resolve(process.cwd(), dir, 'package.json'))
+    const buffer = await readFile(path.resolve(process.cwd(), dir, 'package.json'))
+    return JSON.parse(buffer.toString())
   }
 
   const res = await fetch(`https://unpkg.com/${name}/package.json`)

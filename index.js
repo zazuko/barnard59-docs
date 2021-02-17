@@ -17,36 +17,34 @@ const ns = {
   rdfs: namespace('http://www.w3.org/2000/01/rdf-schema#')
 }
 
-async function packageInfo (name, { local }) {
+async function packageInfo(name, { local }) {
   if (local) {
     const buffer = await readFile(path.resolve(process.cwd(), name, 'package.json'))
     return JSON.parse(buffer.toString())
   }
-
   const res = await fetch(`https://unpkg.com/${name}/package.json`)
 
   if (!res.ok) {
-    throw new Error(`${res.status}: ${res.statusText}`)
+    throw new Error(`The package.json file doesn't exist for ${name}. Check if the package is published. ${res.status}: ${res.statusText}`)
   }
 
   return res.json()
 }
 
-async function packageManifest (name, { local }) {
+async function packageManifest(name, { local }) {
   const manifestPtr = local
     ? clownface().namedNode(`file:${path.resolve(process.cwd(), name, 'manifest.ttl')}`)
     : clownface().namedNode(`https://unpkg.com/${name}/manifest.ttl`)
-
   const res = await manifestPtr.fetch()
 
   for (const { response } of res.failures.values()) {
-    throw new Error(`${response.status}: ${response.statusText}`)
+    throw new Error(`The manifest.ttl file doesn't exist for ${name}. ${response.status}: ${response.statusText}`)
   }
 
   return res
 }
 
-function operationToMarkdown (operation, { language, template }) {
+function operationToMarkdown(operation, { language, template }) {
   const label = operation.out(ns.rdfs.label, { language }).value
   const comment = operation.out(ns.rdfs.comment, { language }).value
   const ecmaScriptLink = operation.out(ns.code.implementedBy).has(ns.rdf.type, ns.code.EcmaScript).out(ns.code.link)
@@ -55,7 +53,7 @@ function operationToMarkdown (operation, { language, template }) {
   return eval(`\`${template}\``)
 }
 
-function manifestToMarkdown (manifest, {
+function manifestToMarkdown(manifest, {
   language = defaults.language,
   operationTemplate = defaults.operationTemplate
 } = {}) {
@@ -66,7 +64,7 @@ function manifestToMarkdown (manifest, {
     .join('\n')
 }
 
-function infoToMarkdown (info, { template = defaults.packageTemplate }) {
+function infoToMarkdown(info, { template = defaults.packageTemplate }) {
   return eval(`\`${template}\``)
 }
 

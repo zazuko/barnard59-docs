@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+import chalk from 'chalk'
 import { Command } from 'commander/esm.mjs'
 import { infoToMarkdown, manifestToMarkdown, packageInfo, packageManifest } from '../index.js'
 
@@ -14,8 +14,15 @@ program
     const output = []
 
     for (const name of program.args) {
-      const info = await packageInfo(name, opts)
-      const manifest = await packageManifest(name, opts)
+      let info, manifest
+      try {
+        info = await packageInfo(name, opts)
+        manifest = await packageManifest(name, opts)
+      } catch (err) {
+        console.warn(chalk.yellow(`Generating doc for ${name} failed. This packaged will be skipped. Error trace:`))
+        console.warn(err)
+        continue
+      }
 
       output.push(infoToMarkdown(info, opts))
       output.push(manifestToMarkdown(manifest, opts))

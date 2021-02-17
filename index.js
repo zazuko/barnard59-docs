@@ -17,9 +17,9 @@ const ns = {
   rdfs: namespace('http://www.w3.org/2000/01/rdf-schema#')
 }
 
-async function packageInfo ({ name, dir }) {
-  if (!name) {
-    const buffer = await readFile(path.resolve(process.cwd(), dir, 'package.json'))
+async function packageInfo (name, { local }) {
+  if (local) {
+    const buffer = await readFile(path.resolve(process.cwd(), name, 'package.json'))
     return JSON.parse(buffer.toString())
   }
 
@@ -32,10 +32,10 @@ async function packageInfo ({ name, dir }) {
   return res.json()
 }
 
-async function packageManifest ({ name, dir, manifest }) {
-  const manifestPtr = name
-    ? clownface().namedNode(`https://unpkg.com/${name}/manifest.ttl`)
-    : clownface().namedNode(`file:${path.resolve(process.cwd(), dir, manifest)}`)
+async function packageManifest (name, { local, manifest }) {
+  const manifestPtr = local
+    ? clownface().namedNode(`file:${path.resolve(process.cwd(), name, manifest)}`)
+    : clownface().namedNode(`https://unpkg.com/${name}/manifest.ttl`)
 
   const res = await manifestPtr.fetch()
 

@@ -8,35 +8,19 @@ const program = new Command()
 program
   .option('--operation-template <filename>', 'ES6 template for an operation')
   .option('--package-template <filename>', 'ES6 template for a package')
-
-program.command('npm <packages...>')
-  .action(async (packages) => {
+  .option('--local', 'Treat arguments as paths to package directories')
+  .option('--manifest <manifest>', 'Path to manifest.ttl relative to package.json', 'manifest.ttl')
+  .action(async () => {
+    const opts = program.opts()
     const output = []
 
-    for (const name of packages) {
-      const info = await packageInfo({ name })
-      const manifest = await packageManifest({ name })
+    for (const name of program.args) {
+      const info = await packageInfo(name, opts)
+      const manifest = await packageManifest(name, opts)
 
-      output.push(infoToMarkdown(info, program.opts()))
-      output.push(manifestToMarkdown(manifest, program.opts()))
+      output.push(infoToMarkdown(info, opts))
+      output.push(manifestToMarkdown(manifest, opts))
     }
-
-    const markdown = output.join('\n')
-
-    process.stdout.write(markdown)
-  })
-
-program.command('local [dir]')
-  .description('Load local package from given directory (relative to working dir)')
-  .option('--manifest <manifest>', 'Path to manifest.ttl relative to <dir>', 'manifest.ttl')
-  .action(async (dir = '.', opts) => {
-    const output = []
-
-    const info = await packageInfo({ dir })
-    const manifest = await packageManifest({ dir, manifest: opts.manifest })
-
-    output.push(infoToMarkdown(info, program.opts()))
-    output.push(manifestToMarkdown(manifest, program.opts()))
 
     const markdown = output.join('\n')
 

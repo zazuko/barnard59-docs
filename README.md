@@ -8,10 +8,10 @@ The package provides a command line interface to create markdown with details ab
 
 ### Extracting info about published packages
 
-Call it with a list of packages and pipe the output to a file:
+Simply call it with a list of packages and pipe the output to a file:
 
 ```bash
-barnard59-docs npm barnard59-core barnard59-base > docs.md
+barnard59-docs barnard59-core barnard59-base > docs.md
 ```
 
 The packages are listed in the order they are given.
@@ -23,13 +23,11 @@ The templates are evaluated as ES6 template strings.
 ### Extracting info about local package
 
 ```bash
-barnard59-docs local
+barnard59-docs --local .
 ```
 
-By default, is looks for a `package.json` and `manifest.ttl` in local working directory. Additional options can be provided to change their locations.
+By default, is looks for a `package.json` and `manifest.ttl` in each of the given directories. Additional option can be provided to change the expected manifest's location relative to the package.
 
 ```bash
-barnard59-docs local package/barnard59-example --manifest about.ttl
+barnard59-docs --local --manifest about.ttl package/barnard59-example
 ```
-
-`manifest` is relative to the provided path, and not current working directory!

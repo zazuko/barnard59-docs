@@ -9,7 +9,6 @@ program
   .option('--operation-template <filename>', 'ES6 template for an operation')
   .option('--package-template <filename>', 'ES6 template for a package')
   .option('--local', 'Treat arguments as paths to package directories')
-  .option('--manifest <manifest>', 'Path to manifest.ttl relative to package.json', 'manifest.ttl')
   .action(async () => {
     const opts = program.opts()
     const output = []

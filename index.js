@@ -32,9 +32,9 @@ async function packageInfo (name, { local }) {
   return res.json()
 }
 
-async function packageManifest (name, { local, manifest }) {
+async function packageManifest (name, { local }) {
   const manifestPtr = local
-    ? clownface().namedNode(`file:${path.resolve(process.cwd(), name, manifest)}`)
+    ? clownface().namedNode(`file:${path.resolve(process.cwd(), name, 'manifest.ttl')}`)
     : clownface().namedNode(`https://unpkg.com/${name}/manifest.ttl`)
 
   const res = await manifestPtr.fetch()

@@ -8,7 +8,7 @@ The package provides a command line interface to create markdown with details ab
 
 ### Extracting info about published packages
 
-Simply call it with a list of packages and pipe the output to a file:
+Just call it with a list of packages and pipe the output to a file:
 
 ```bash
 barnard59-docs barnard59-core barnard59-base > docs.md

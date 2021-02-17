@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 import chalk from 'chalk'
 import { Command } from 'commander/esm.mjs'
-import { infoToMarkdown, manifestToMarkdown, packageInfo, packageManifest } from '../index.js'
+import { infoToMarkdown, manifestToMarkdown, packageInfo, packageManifest, defaults } from '../index.js'
+
 
 const program = new Command()
 
 program
   .option('--operation-template <filename>', 'ES6 template for an operation')
-  .option('--package-template <filename>', 'ES6 template for a package')
+  .option('--package-template <filename>', 'ES6 template for a package', defaults.packageTemplate)
 
 program.parse(process.argv)
 

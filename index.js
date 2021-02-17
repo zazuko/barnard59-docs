@@ -7,7 +7,8 @@ import rdf from 'rdf-ext'
 const defaults = {
   language: ['en', '*'],
   operationTemplate: await readFile('operation.template'),
-  packageTemplate: await readFile('package.template')
+  packageTemplate: await readFile('package.template'),
+  packageListTemplate: await readFile('packageList.template'),
 }
 
 const ns = {
@@ -56,13 +57,28 @@ function manifestToMarkdown(manifest, {
     .join('\n')
 }
 
-function infoToMarkdown(info, { template = defaults.packageTemplate }) {
-  return eval(`\`${template}\``)
+function infoToMarkdown(info, { packageTemplate = null }) {
+  return eval(`\`${packageTemplate}\``)
 }
+
+async function getJson(url) {
+
+  let data = await fetch(url, {
+    method: 'GET',
+    headers: { 'Accept': 'application/json', "User-Agent": "Barnard59-Docs" }
+  })
+    .then(res => res.json())
+    .catch(err => { throw err });
+
+  return data
+}
+
+
 
 export {
   defaults,
   infoToMarkdown,
+  getJson,
   manifestToMarkdown,
   ns,
   packageInfo,
